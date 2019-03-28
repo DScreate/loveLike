@@ -132,7 +132,7 @@ function Timer:tween(delay, subject, target, method, after, tag, ...)
     elseif type(after) == 'function' then tag = UUID()
     else tag = tag or UUID() end
     self:cancel(tag)
-    self.timers[tag] = {type = 'tween', time = 0, delay = self:__getResolvedDelay(delay), subject = subject, target = target, method = method, after = after or function() end, 
+    self.timers[tag] = {type = 'tween', time = 0, delay = self:__getResolvedDelay(delay), subject = subject, target = target, method = method, after = after or function() end,
                         args = {...}, last_s = 0, payload = self:__tweenCollectPayload(subject, target, {})}
     return tag
 end

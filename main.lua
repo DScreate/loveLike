@@ -2,6 +2,9 @@ Object = require 'lib/classic/classic'
 Input = require 'lib/boipushy/Input'
 Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
+utils = require 'lib/utils'
+
+GameObject = require 'bin/GameObject'
 
 function love.load(arg)
 	-- object recursive require
@@ -18,25 +21,28 @@ function love.load(arg)
 	input = Input()
 	timer = Timer()
 
-	gw = 800
-	gh = 600
-
-	love.window.setMode(gw, gh, {resizable=true, vsync=true, minwidth=400, minheight=300})
+	-- graphics adjusting
+	resize(2)
+	love.graphics.setDefaultFilter('nearest')
+	love.graphics.setLineStyle('rough')
+	-- love.window.setMode(gw, gh, {resizable=true, vsync=true, minwidth=400, minheight=300})
 
 	-- room logic
 	rooms = {}
 	current_room = nil
 
-	--CircleRoom = require('bin/rooms/CircleRoom')
-
 	-- body
+	-- love.graphics.circle('fill', 50, 50, 50)
+
 	gotoRoom('Stage')
 
 	input:bind('f1', function() gotoRoom('CircleRoom') end)
-    input:bind('f2', function() gotoRoom('RectangleRoom') end)
-    input:bind('f3', function() gotoRoom('PolygonRoom') end)
+  input:bind('f2', function() gotoRoom('RectangleRoom') end)
+  input:bind('f3', function() gotoRoom('PolygonRoom') end)
+	input:bind('a', function() gotoRoom('Stage') end)
 
 end
+
 
 function love.update(dt)
 	-- timer update
@@ -50,6 +56,9 @@ function love.update(dt)
 end
 
 function love.draw()
+	-- FPS Display
+	love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+
 	-- room logic
 	if current_room then current_room:draw() end
 
@@ -80,8 +89,6 @@ end
 function addRoom(room_type, room_name, ...)
 	local room = _G[room_type](room_name, ...)
 	rooms[room_name] = room
-	--print("Created new room: ")
-	--print(room_name)
 	return room
 end
 
@@ -119,6 +126,13 @@ function recursiveEnumerate(folder, file_list)
 		end
 	end
 end
+
+function resize(s)
+    love.window.setMode(s*gw, s*gh)
+    sx, sy = s, s
+end
+
+-- LOVE FUNCTIONS --
 
 function love.run()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
