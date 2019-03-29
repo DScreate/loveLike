@@ -3,8 +3,15 @@ Input = require 'lib/boipushy/Input'
 Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
 utils = require 'lib/utils'
+Camera = require 'lib/hump/camera'
 
 GameObject = require 'bin/GameObject'
+
+-- mlib = require 'lib/windfield/mlib/mlib'
+Physics = require 'lib/windfield'
+
+-- array to hold collision messages
+local text = {}
 
 function love.load(arg)
 	-- object recursive require
@@ -20,6 +27,7 @@ function love.load(arg)
 	-- manual associations for requires
 	input = Input()
 	timer = Timer()
+	camera = Camera()
 
 	-- graphics adjusting
 	resize(2)
@@ -36,10 +44,7 @@ function love.load(arg)
 
 	gotoRoom('Stage')
 
-	input:bind('f1', function() gotoRoom('CircleRoom') end)
-  input:bind('f2', function() gotoRoom('RectangleRoom') end)
-  input:bind('f3', function() gotoRoom('PolygonRoom') end)
-	input:bind('a', function() gotoRoom('Stage') end)
+	input:bind('s', function() camera:shake(4, 60, 1) end)
 
 end
 
@@ -47,11 +52,15 @@ end
 function love.update(dt)
 	-- timer update
 	timer:update(dt)
+	-- camera Update
+	camera:update(dt)
 	-- room logic
 	if current_room then current_room:update(dt) end
 
 
 	-- body
+
+	-- check for collisions
 
 end
 
@@ -82,7 +91,7 @@ end
 --[[
 ** LOGIC FOR NOT SAVING ROOMS IN BETWEEN LOADING THEM **
 function gotoRoom(room_type, ...)
-    current_room = _G[room_type](...)
+current_room = _G[room_type](...)
 end
 ]]--
 
@@ -128,8 +137,8 @@ function recursiveEnumerate(folder, file_list)
 end
 
 function resize(s)
-    love.window.setMode(s*gw, s*gh)
-    sx, sy = s, s
+	love.window.setMode(s*gw, s*gh)
+	sx, sy = s, s
 end
 
 -- LOVE FUNCTIONS --
