@@ -46,6 +46,34 @@ function love.load(arg)
 
 	input:bind('s', function() camera:shake(4, 60, 1) end)
 
+	input:bind('f1', 'f1')
+	input:bind('f2', function()
+		gotoRoom('Stage')
+	end)
+	input:bind('f3', function()
+		input:bind('f3', function()
+        if current_room then
+            current_room:destroy()
+            current_room = nil
+        end
+    end)
+	end)
+	input:bind('f4', 'f4')
+
+	input:bind('left', 'left')
+	input:bind('right', 'right')
+
+	-- MEMORY CHECKING --
+	input:bind('f1', function()
+		print("Before collection: " .. collectgarbage("count")/1024)
+		collectgarbage()
+		print("After collection: " .. collectgarbage("count")/1024)
+		print("Object count: ")
+		local counts = type_count()
+		for k, v in pairs(counts) do print(k, v) end
+		print("-------------------------------------")
+	end)
+
 end
 
 
@@ -59,8 +87,6 @@ function love.update(dt)
 
 
 	-- body
-
-	-- check for collisions
 
 end
 
@@ -91,11 +117,13 @@ end
 --[[
 ** LOGIC FOR NOT SAVING ROOMS IN BETWEEN LOADING THEM **
 function gotoRoom(room_type, ...)
+if current_room and current_room.destroy then current_room:destroy() end
 current_room = _G[room_type](...)
 end
 ]]--
 
 function addRoom(room_type, room_name, ...)
+	if current_room and current_room.destroy then current_room:destroy() end
 	local room = _G[room_type](room_name, ...)
 	rooms[room_name] = room
 	return room

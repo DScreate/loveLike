@@ -7,8 +7,7 @@ function Stage:new()
   self.timer = Timer()
 
   self.player = self.zone:addGameObject('Player', gw/2, gh/2)
-
-  self.zone.world:setGravity(0, 2)
+  --self.zone.world:setGravity(0, 2)
 end
 
 function Stage:update(dt)
@@ -26,7 +25,7 @@ function Stage:draw()
   camera:detach()
   love.graphics.setCanvas()
 
-  love.graphics.setColor(1, 1, 1, 1)
+  setColor(255, 255, 255, 255)
   love.graphics.setBlendMode('alpha', 'premultiplied')
   love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
   love.graphics.setBlendMode('alpha')
