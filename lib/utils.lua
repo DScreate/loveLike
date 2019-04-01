@@ -13,7 +13,11 @@ function UUID()
 end
 
 function setColor(r, g, b, a)
-   love.graphics.setColor(r/255, g/255, b/255, a/255)
+   love.graphics.setColor(r/255, g/255, b/255, (a or 255)/255)
+end
+
+function useColor(swatch)
+  love.graphics.setColor(swatch[1]/255, swatch[2]/255, swatch[3]/255, (swatch[4] or 255)/255)
 end
 
 function pushRotate(x, y, r)

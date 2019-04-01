@@ -8,11 +8,14 @@ function Stage:new()
 
   self.player = self.zone:addGameObject('Player', gw/2, gh/2)
   --self.zone.world:setGravity(0, 2)
+
+  camera:setFollowLerp(0.4)
+  camera:setFollowLead(1)
+  camera:setFollowStyle('TOPDOWN')
 end
 
 function Stage:update(dt)
-  camera.smoother = Camera.smooth.damped(5)
-  camera:lockPosition(dt, gw/2, gh/2)
+  camera:update(dt)
   self.zone:update(dt)
 end
 
@@ -20,9 +23,10 @@ function Stage:draw()
 
   love.graphics.setCanvas(self.main_canvas)
   love.graphics.clear()
-  camera:attach(0, 0, gw, gh)
+  camera:attach()
   self.zone:draw()
   camera:detach()
+  camera:draw()
   love.graphics.setCanvas()
 
   setColor(255, 255, 255, 255)

@@ -4,9 +4,11 @@ Input = require 'lib/boipushy/Input'
 Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
 utils = require 'lib/utils'
-Camera = require 'lib/hump/camera'
+Camera = require 'lib/STALKER-X/Camera'
 
 GameObject = require 'bin/GameObject'
+
+Colors = require 'bin/style/Colors'
 
 -- mlib = require 'lib/windfield/mlib/mlib'
 Physics = require 'lib/windfield'
@@ -41,10 +43,16 @@ function love.load(arg)
 	current_room = nil
 
 	-- body
+
+	slow_amount = 1
 	-- love.graphics.circle('fill', 50, 50, 50)
 
 
 	gotoRoom('Stage')
+
+
+	input:bind('up', 'boost')
+	input:bind('down', 'brake')
 
 	input:bind('s', function() camera:shake(4, 60, 1) end)
 
@@ -78,20 +86,6 @@ function love.load(arg)
 
 end
 
-
-function love.update(dt)
-	-- timer update
-	timer:update(dt)
-	-- camera Update
-	camera:update(dt)
-	-- room logic
-	if current_room then current_room:update(dt) end
-
-
-	-- body
-
-end
-
 function love.draw()
 	-- FPS Display
 	love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
@@ -100,6 +94,15 @@ function love.draw()
 	if current_room then current_room:draw() end
 
 	-- body
+	if flash_frames then
+		flash_frames = flash_frames - 1
+		if flash_frames == -1 then flash_frames = nil end
+	end
+	if flash_frames then
+		useColor(background_color)
+		love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
+		setColor(1, 1, 1)
+	end
 
 end
 
@@ -144,6 +147,15 @@ function gotoRoom(room_type, ...)
 end
 
 -- HELPER FUNCTIONS --
+function slow(amount, duration)
+	slow_amount = amount
+	timer:tween(duration, _G, {slow_amount = 1}, 'in-out-cubic', 'slow')
+end
+
+function flash(frames)
+	flash_frames = frames
+end
+
 function requireFiles(files)
 	for _, file_iter in ipairs(files) do
 		local file = file_iter:sub(1, -5)
@@ -172,6 +184,11 @@ function resize(s)
 end
 
 -- LOVE FUNCTIONS --
+function love.update(dt)
+	timer:update(dt*slow_amount)
+	camera:update(dt*slow_amount)
+	if current_room then current_room:update(dt*slow_amount) end
+end
 
 function love.run()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end

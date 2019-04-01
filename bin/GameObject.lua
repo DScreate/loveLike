@@ -7,7 +7,9 @@ function GameObject:new(zone, x, y, opts)
     self.zone = zone
     self.x, self.y = x, y
     self.dead = false
+    self.depth = 50
     self.timer = Timer()
+    self.creation_time = love.timer.getTime()
     self.id = UUID()
 end
 
