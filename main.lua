@@ -1,5 +1,6 @@
 Object = require 'lib/classic/classic'
 Input = require 'lib/boipushy/Input'
+-- Timer = require 'lib/hump/Timer'
 Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
 utils = require 'lib/utils'
@@ -42,6 +43,7 @@ function love.load(arg)
 	-- body
 	-- love.graphics.circle('fill', 50, 50, 50)
 
+
 	gotoRoom('Stage')
 
 	input:bind('s', function() camera:shake(4, 60, 1) end)
@@ -52,11 +54,11 @@ function love.load(arg)
 	end)
 	input:bind('f3', function()
 		input:bind('f3', function()
-        if current_room then
-            current_room:destroy()
-            current_room = nil
-        end
-    end)
+			if current_room then
+				current_room:destroy()
+				current_room = nil
+			end
+		end)
 	end)
 	input:bind('f4', 'f4')
 

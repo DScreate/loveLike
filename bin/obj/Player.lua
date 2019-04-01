@@ -14,8 +14,19 @@ function Player:new(zone, x, y, opts)
   self.max_v = 100
   self.a = 100
 
-  self.timer:every(0.24, function()
+  self.attack_speed = 1
+  timer:every(5, function() self.attack_speed = random(1, 2) end)
+
+  --timer:after(1, function(func) print("foo") timer:after(1, 'func') end)
+
+  self:autoShoot()
+
+end
+
+function Player:autoShoot()
+  self.timer:after(0.24/self.attack_speed, function()
     self:shoot()
+    self:autoShoot()
   end)
 end
 
@@ -24,6 +35,9 @@ function Player:shoot()
 
   self.zone:addGameObject('ShootEffect', self.x + d*math.cos(self.r),
   self.y + d*math.sin(self.r), {player = self, d = d})
+
+  self.zone:addGameObject('Projectile', self.x + 1.5* d * math.cos(self.r),
+  self.y + 1.5*d*math.sin(self.r), {r = self.r})
 end
 
 function Player:update(dt)
@@ -39,12 +53,13 @@ end
 function Player:draw()
   setColor(107, 111, 244, 255)
   love.graphics.circle('line', self.x, self.y, self.w)
-  love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
+  love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r),
+  self.y + 2*self.w*math.sin(self.r))
   -- love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
 end
 
 function Player:destroy()
-    Player.super.destroy(self)
+  Player.super.destroy(self)
 end
 
 return Player
