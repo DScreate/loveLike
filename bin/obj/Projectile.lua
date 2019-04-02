@@ -8,11 +8,16 @@ function Projectile:new(zone, x, y, opts)
   self.v = opts.v or 200
   self.color = hp_color
 
+  self.TTD = opts.ttd or 12
+
   self.collider = self.zone.world:newCircleCollider(self.x, self.y, self.s)
+  self.collider:setCollisionClass('Projectile')
+
   self.collider:setObject(self)
   self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
   self.timer:tween(0.5, self, {v = 400}, 'linear')
+  self.timer:after(self.TTD, function() self:die() end)
 
 end
 
@@ -20,12 +25,6 @@ function Projectile:update(dt)
   Projectile.super.update(self, dt)
   self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
-
-  -- TODO Look into refactoring to be based upon collider impacting edge of play area
-  if self.x < 0 then self:die() end
-  if self.y < 0 then self:die() end
-  if self.x > gw then self:die() end
-  if self.y > gh then self:die() end
 end
 
 function Projectile:draw()

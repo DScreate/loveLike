@@ -5,6 +5,8 @@ Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
 utils = require 'lib/utils'
 Camera = require 'lib/STALKER-X/Camera'
+Draft = require 'lib/draft/draft'
+Vector = require 'lib/hump/vector'
 
 GameObject = require 'bin/GameObject'
 
@@ -31,6 +33,7 @@ function love.load(arg)
 	input = Input()
 	timer = Timer()
 	camera = Camera()
+	draft = Draft()
 
 	-- graphics adjusting
 	resize(2)

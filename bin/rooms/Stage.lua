@@ -3,15 +3,29 @@ local Stage = Object:extend()
 function Stage:new()
   self.zone = Zone(self)
   self.zone:addPhysicsWorld()
+  self.zone.world:addCollisionClass('Player')
+  self.zone.world:addCollisionClass('Projectile', {ignores = {'Projectile'}})
+  self.zone.world:addCollisionClass('Collectable', {ignores = {'Collectable', 'Projectile'}})
+
+
   self.main_canvas = love.graphics.newCanvas(gw, gh)
   self.timer = Timer()
 
   self.player = self.zone:addGameObject('Player', gw/2, gh/2)
   --self.zone.world:setGravity(0, 2)
 
+  input:bind('p', function()
+    --self.zone:addGameObject('Ammo', random(0, gw), random(0, gh))
+    self:spawnWithinRange('Ammo', gw, gh)
+  end)
+
   camera:setFollowLerp(0.4)
   camera:setFollowLead(1)
   camera:setFollowStyle('TOPDOWN')
+end
+
+function Stage:spawnWithinRange(gameObject, x, y)
+  self.zone:addGameObject(gameObject, self.player.x + random(0-x, x), self.player.y + random(0-y, y))
 end
 
 function Stage:update(dt)

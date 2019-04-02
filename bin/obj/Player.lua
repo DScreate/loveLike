@@ -5,8 +5,12 @@ function Player:new(zone, x, y, opts)
 
   self.x, self.y = x, y
   self.w, self.h = 12, 12
+
+  -- Collision setup
   self.collider = self.zone.world:newCircleCollider(self.x, self.y, self.w)
   self.collider:setObject(self)
+  self.collider:setCollisionClass('Player')
+
 
   self.r = -math.pi/2
   self.rv = 1.66*math.pi
@@ -14,6 +18,17 @@ function Player:new(zone, x, y, opts)
   self.base_max_v = 100
   self.max_v = self.base_max_v
   self.a = 100
+  self.max_boost = 100
+  self.boost = self.max_boost
+  self.can_boost = true
+  self.boost_timer = 0
+  self.boost_cooldown = 2
+
+  self.max_hp = 100
+  self.hp = self.max_hp
+
+  self.max_ammo = 100
+  self.ammo = self.max_ammo
 
   self.trail_color = skill_point_color
   self.timer:every(0.01, function()
@@ -57,6 +72,10 @@ end
 
 function Player:update(dt)
   Player.super.update(self, dt)
+  self.boost = math.min(self.boost + 10*dt, self.max_boost)
+  -- self.boost_timer = self.boost_timer + dt
+  if self.boost_timer > self.boost_cooldown then self.can_boost = true
+  else self.boost_timer = self.boost_timer + dt end
 
   if input:down('left') then self.r = self.r - self.rv * dt end
   if input:down('right') then self.r = self.r + self.rv * dt end
@@ -67,17 +86,33 @@ function Player:update(dt)
   self.boosting = false
   self.braking = false
 
-  if input:down('boost') then
-    self.max_v = 1.5*self.base_max_v
+  if input:down('boost') and self.boost > 1 and self.can_boost then
+    self.max_v = 2.0*self.base_max_v
     self.boosting = true
     self.trail_color = {85, 153, 204}
-  elseif input:down('brake') then
+    self.boost = self.boost - 50*dt
+    if self.boost <= 1 then
+      self.boosting = false
+      self.can_boost = false
+      self.boost_timer = 0
+    end
+  elseif input:down('brake') and self.boost > 1 and self.can_boost then
     self.max_v = 0.5*self.base_max_v
     self.braking = true
     self.trail_color = {171, 64, 54}
+    self.boost = self.boost - 50*dt
+    if self.boost <= 1 then
+      self.boosting = false
+      self.can_boost = false
+      self.boost_timer = 0
+    end
   else
     self.max_v = self.base_max_v
     self.trail_color = skill_point_color
+  end
+
+  if self.collider:enter('Collectable') then
+    print(1)
   end
 
 
