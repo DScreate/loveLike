@@ -111,8 +111,11 @@ function Player:update(dt)
     self.trail_color = skill_point_color
   end
 
+  -- TODO Make collision checks into switch for more generic implementation
   if self.collider:enter('Collectable') then
-    print(1)
+      local collision_data = self.collider:getEnterCollisionData('Collectable')
+      local object = collision_data.collider:getObject()
+          object:die()
   end
 
 
@@ -126,8 +129,13 @@ function Player:update(dt)
   ]]--
 end
 
+function Player:addAmmo(amount)
+    self.ammo = math.min(self.ammo + amount, self.max_ammo)
+end
+
 function Player:draw()
-  setColor(107, 111, 244, 255)
+  --setColor(107, 111, 244, 255)
+  useColor({107, 111, 244})
   --useColor()
   love.graphics.circle('line', self.x, self.y, self.w)
   love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r),

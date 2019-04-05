@@ -16,7 +16,11 @@ function Stage:new()
 
   input:bind('p', function()
     --self.zone:addGameObject('Ammo', random(0, gw), random(0, gh))
-    self:spawnWithinRange('Ammo', gw, gh)
+    self:spawnWithinRange('Ammo', gw / 2, gh / 2)
+  end)
+
+  input:bind('b', function()
+    self:spawnWithinRange('Boost', gw / 2, gh / 2)
   end)
 
   camera:setFollowLerp(0.4)
