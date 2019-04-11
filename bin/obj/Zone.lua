@@ -4,7 +4,16 @@ function Zone:new(room)
   print('Making Zone')
   self.room = room
   self.game_objects = {}
+end
 
+function Zone:getAllGameObjectsThat(filter)
+    local out = {}
+    for _, game_object in pairs(self.game_objects) do
+        if filter(game_object) then
+            table.insert(out, game_object)
+        end
+    end
+    return out
 end
 
 function Zone:addPhysicsWorld()
@@ -31,7 +40,7 @@ function Zone:draw()
   end)
 
   -- Uncomment this line to view colliders within zone
-  -- if self.world then self.world:draw() end
+  if self.world then self.world:draw() end
   for _, game_object in ipairs(self.game_objects) do game_object:draw() end
 end
 

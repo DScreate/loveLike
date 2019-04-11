@@ -49,6 +49,18 @@ function Player:new(zone, x, y, opts)
 
 end
 
+function Player:addAmmo(amount)
+  self.ammo = math.max(math.min(self.ammo + amount, self.max_ammo), 0)
+end
+
+function Player:addBoost(amount)
+  self.boost = math.max(math.min(self.boost + amount, self.max_boost), 0)
+end
+
+function Player:addHP(amount)
+  self.hp = math.max(math.min(self.hp + amount, self.max_hp), 0)
+end
+
 function Player:tick()
   self.zone:addGameObject('TickEffect', self.x, self.y, {parent = self})
 end
@@ -113,9 +125,9 @@ function Player:update(dt)
 
   -- TODO Make collision checks into switch for more generic implementation
   if self.collider:enter('Collectable') then
-      local collision_data = self.collider:getEnterCollisionData('Collectable')
-      local object = collision_data.collider:getObject()
-          object:die()
+    local collision_data = self.collider:getEnterCollisionData('Collectable')
+    local object = collision_data.collider:getObject()
+    object:die()
   end
 
 
@@ -130,7 +142,7 @@ function Player:update(dt)
 end
 
 function Player:addAmmo(amount)
-    self.ammo = math.min(self.ammo + amount, self.max_ammo)
+  self.ammo = math.min(self.ammo + amount, self.max_ammo)
 end
 
 function Player:draw()

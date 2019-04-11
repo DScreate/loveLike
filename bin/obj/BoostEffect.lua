@@ -33,7 +33,7 @@ function BoostEffect:draw()
 
   useColor(self.current_color)
   draft:rhombus(self.x, self.y, 1.34*self.w, 1.34*self.h, 'fill')
-  draft:rhombus(self.x, self.y, 3*self.w, 3*self.h, 'line')
+  draft:rhombus(self.x, self.y, 2*self.w * self.sx, 2*self.h * self.sy, 'line')
   useColor(default_color)
 
 end

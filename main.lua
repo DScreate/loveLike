@@ -7,6 +7,7 @@ utils = require 'lib/utils'
 Camera = require 'lib/STALKER-X/Camera'
 Draft = require 'lib/draft/draft'
 Vector = require 'lib/hump/vector'
+utf8sub = require 'lib/utf8'
 
 GameObject = require 'bin/GameObject'
 
@@ -28,6 +29,11 @@ function love.load(arg)
 	room_files = {}
 	recursiveEnumerate('bin/rooms', room_files)
 	requireFiles(room_files)
+
+	font_files = {}
+	recursiveEnumerate('resources/fonts', font_files)
+	fonts = {}
+	loadFonts(font_files)
 
 	-- manual associations for requires
 	input = Input()
@@ -166,6 +172,18 @@ function requireFiles(files)
 		local class_name = file:sub(last_forward_slash_index+1, #file)
 		package.loaded[file] = nil
 		_G[class_name] = require(file)
+	end
+end
+
+function loadFonts(files)
+	for i = 8, 16, 1 do
+			for _, font_path in pairs(files) do
+					local last_forward_slash_index = font_path:find("/[^/]*$")
+					local font_name = font_path:sub(last_forward_slash_index+1, -5)
+					local font = love.graphics.newFont(font_path, i)
+					font:setFilter('nearest', 'nearest')
+					fonts[font_name .. '_' .. i] = font
+			end
 	end
 end
 

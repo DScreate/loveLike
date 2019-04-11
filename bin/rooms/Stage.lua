@@ -4,7 +4,7 @@ function Stage:new()
   self.zone = Zone(self)
   self.zone:addPhysicsWorld()
   self.zone.world:addCollisionClass('Player')
-  self.zone.world:addCollisionClass('Projectile', {ignores = {'Projectile'}})
+  self.zone.world:addCollisionClass('Projectile', {ignores = {'Projectile', 'Player'}})
   self.zone.world:addCollisionClass('Collectable', {ignores = {'Collectable', 'Projectile'}})
 
 
@@ -21,6 +21,10 @@ function Stage:new()
 
   input:bind('b', function()
     self:spawnWithinRange('Boost', gw / 2, gh / 2)
+  end)
+
+  input:bind('h', function()
+    self:spawnWithinRange('HPResource', gw / 2, gh / 2)
   end)
 
   camera:setFollowLerp(0.4)
