@@ -41,12 +41,14 @@ function Ammo:draw()
   love.graphics.pop()
   love.graphics.setColor(default_color)
 
-  love.graphics.circle('line', self.x, self.y, self.attract_distance)
+  --love.graphics.circle('line', self.x, self.y, self.attract_distance)
 
+  --[[
   if self.current_vector then
     love.graphics.line(self.x, self.y,
     self.x + self.current_vector.x * self.v, self.y + self.current_vector.y * self.v)
   end
+  ]]
 end
 
 function Ammo:die()

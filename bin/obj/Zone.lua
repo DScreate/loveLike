@@ -40,7 +40,7 @@ function Zone:draw()
   end)
 
   -- Uncomment this line to view colliders within zone
-  if self.world then self.world:draw() end
+  -- if self.world then self.world:draw() end
   for _, game_object in ipairs(self.game_objects) do game_object:draw() end
 end
 

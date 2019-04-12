@@ -30,6 +30,16 @@ function Player:new(zone, x, y, opts)
   self.max_ammo = 100
   self.ammo = self.max_ammo
 
+  --self.shoot_timer = 0
+  --self.shoot_cooldown = 0.24
+  -- ATTACK DVC
+  self.ammo_cost = 0
+  self.attack_speed = 1
+  self.attack = 'Neutral'
+  --
+
+  self:setAttack('Neutral')
+
   self.trail_color = skill_point_color
   self.timer:every(0.01, function()
     self.zone:addGameObject('TrailParticle',
@@ -37,12 +47,12 @@ function Player:new(zone, x, y, opts)
     {parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color})
   end)
 
-  self.attack_speed = 1
-  timer:every(5, function() self.attack_speed = random(1, 2) end)
+  --timer:every(5, function() self.attack_speed = random(1, 2) end)
 
   --timer:after(1, function(func) print("foo") timer:after(1, 'func') end)
   input:bind('f4', function() self:die() end)
   input:bind('f5', function() slow(2, 2) end)
+  input:bind('t', function() self:setAttack('Double') end)
 
   self:autoShoot()
   self.timer:every(5, function() self:tick() end)
@@ -50,15 +60,25 @@ function Player:new(zone, x, y, opts)
 end
 
 function Player:addAmmo(amount)
+  print('Adding ammo')
   self.ammo = math.max(math.min(self.ammo + amount, self.max_ammo), 0)
 end
 
 function Player:addBoost(amount)
+  print('Adding boost')
   self.boost = math.max(math.min(self.boost + amount, self.max_boost), 0)
 end
 
 function Player:addHP(amount)
+  print('Adding HP')
   self.hp = math.max(math.min(self.hp + amount, self.max_hp), 0)
+end
+
+function Player:setAttack(attack)
+  self.attack = attack
+  self.attack_speed = attacks[attack].attack_speed
+  self.ammo = self.max_ammo
+  --self.ammo_cost = attacks[attack].ammo_cost
 end
 
 function Player:tick()
@@ -66,20 +86,14 @@ function Player:tick()
 end
 
 function Player:autoShoot()
-  self.timer:after(0.24/self.attack_speed, function()
-    self:shoot()
+  self.timer:after(0.48/self.attack_speed, function()
+    AttackActions[self.attack](self)
     self:autoShoot()
   end)
-end
-
-function Player:shoot()
-  local d = 1.2 * self.w
-
-  self.zone:addGameObject('ShootEffect', self.x + d*math.cos(self.r),
-  self.y + d*math.sin(self.r), {player = self, d = d})
-
-  self.zone:addGameObject('Projectile', self.x + 1.5* d * math.cos(self.r),
-  self.y + 1.5*d*math.sin(self.r), {r = self.r, v = 100})
+  if self.ammo <= 0 then
+    self:setAttack('Neutral')
+    self.ammo = self.max_ammo
+  end
 end
 
 function Player:update(dt)
