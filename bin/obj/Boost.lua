@@ -14,11 +14,18 @@ function Boost:new(zone, x, y, opts)
   self.v = random(10, 20)
   self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
   self.collider:applyAngularImpulse(random(-24, 24))
+
+  self.modAmount = opts.modAmount or 10
 end
 
 function Boost:update(dt)
   Boost.super.update(self, dt)
 end
+
+function Boost:modifyResource(player)
+  incResource(player.boost, self.modAmount, player.max_boost or 100)
+end
+
 
 function Boost:draw()
   useColor(boost_color)

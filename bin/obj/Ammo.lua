@@ -13,7 +13,15 @@ function Ammo:new(zone, x, y, opts)
   self.v = random(10, 20)
   self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
   self.collider:applyAngularImpulse(random(-24, 24))
+
+  self.modAmount = opts.modAmount or 2
 end
+
+function Ammo:modifyResource(player)
+  incResource(player.ammo, player.max_ammo or 100, self.modAmount)
+end
+
+
 
 function Ammo:update(dt)
   Ammo.super.update(self, dt)

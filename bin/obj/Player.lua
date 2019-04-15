@@ -141,6 +141,9 @@ function Player:update(dt)
   if self.collider:enter('Collectable') then
     local collision_data = self.collider:getEnterCollisionData('Collectable')
     local object = collision_data.collider:getObject()
+    if object.modifyResource then
+      object:modifyResource(self)
+    end
     object:die()
   end
 
