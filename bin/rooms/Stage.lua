@@ -6,6 +6,7 @@ function Stage:new()
   self.zone.world:addCollisionClass('Player')
   self.zone.world:addCollisionClass('Projectile', {ignores = {'Projectile', 'Player'}})
   self.zone.world:addCollisionClass('Collectable', {ignores = {'Collectable', 'Projectile'}})
+  self.zone.world:addCollisionClass('Enemy', {ignores = {'Collectable'}})
 
   self.static_background = DrawZone(self)
   self.static_background:addDrawable(function()
@@ -45,6 +46,19 @@ function Stage:new()
     self:spawnWithinRange('HPResource', gw / 2, gh / 2)
   end)
 
+  input:bind('r', function()
+    self:spawnWithinRange('Rock', gw / 2, gh / 2, { size = 16 })
+  end)
+
+  input:bind('q', function()
+    print(self.scrolling_background)
+    local color = makeRandomSwatch()
+    local x, y = self.player.x + random(-gw/2, gw/2), self.player.y + random(-gh/2, gh/2)
+    local w, h = random(20, 100), random(20, 100)
+    self:addDrawableWithinRange(self.scrolling_background, function() useColor(color) love.graphics.rectangle('fill', x, y, w, h) end
+    , gw / 2, gh / 2, { size = 16 })
+  end)
+
   --input:bind('f8', function() self:moveLayer() end)
 
   camera:setFollowLerp(0.4)
@@ -61,26 +75,38 @@ end
 
 --[[
 function Stage:moveLayer()
-  for i = 1, #camera.layers, 1 do
-    local copy = camera.layers[i]
-    if (camera.layers[i+1]) then
-      local ref = camera.layers[i+1]
-      ref.order = copy.order
-      ref.scale = copy.scale
-    else
-      camera.layers[i+1] = copy
-    end
-  end
+for i = 1, #camera.layers, 1 do
+local copy = camera.layers[i]
+if (camera.layers[i+1]) then
+local ref = camera.layers[i+1]
+ref.order = copy.order
+ref.scale = copy.scale
+else
+camera.layers[i+1] = copy
+end
+end
 end
 ]]
 
-function Stage:spawnWithinRange(gameObject, x, y)
-  self.zone:addGameObject(gameObject, self.player.x + random(0-x, x), self.player.y + random(0-y, y))
+function Stage:addDrawableWithinRange(drawZone, drawable, x, y, opts)
+  useColor(hp_color)
+  if type(drawable) == "string" then
+    drawZone:addGameObject(drawable, self.player.x + random(0-x, x), self.player.y + random(0-y, y), opts)
+  else
+    drawZone:addDrawable(drawable)
+  end
+end
+
+function Stage:spawnWithinRange(gameObject, x, y, opts)
+  self.zone:addGameObject(gameObject, self.player.x + random(0-x, x), self.player.y + random(0-y, y), opts)
 end
 
 function Stage:update(dt)
   camera:update(dt)
   self.zone:update(dt)
+  self.static_background:update(dt)
+  self.scrolling_background:update(dt)
+  self.foreground:update(dt)
 end
 
 function Stage:draw()

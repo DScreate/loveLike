@@ -12,8 +12,23 @@ function UUID()
   return (("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", fn))
 end
 
+function createIrregularPolygon(point_amount, size)
+  local point_amount = point_amount or 8
+  local size = size or 8
+  local points = {}
+  for i = 1, point_amount do
+    local angle_interval = 2*math.pi/point_amount
+    local distance = size + random(-size/4, size/4)
+    local angle = (i-1)*angle_interval + random(-angle_interval/4, angle_interval/4)
+    table.insert(points, distance*math.cos(angle))
+    table.insert(points, distance*math.sin(angle))
+  end
+  return points
+
+end
+
 function areRectanglesOverlapping(x1, y1, x2, y2, x3, y3, x4, y4)
-   return not (x3 > x2 or x4 < x1 or y3 > y2 or y4 < y1)
+  return not (x3 > x2 or x4 < x1 or y3 > y2 or y4 < y1)
 end
 
 function setColor(r, g, b, a)
@@ -37,7 +52,7 @@ function invertSwatch(swatch)
   return {255 - swatch[1], 255 - swatch[2], 255 - swatch[3], 255}
 end
 function table.random(t)
-    return t[love.math.random(1, #t)]
+  return t[love.math.random(1, #t)]
 end
 
 function pushRotate(x, y, r)
