@@ -3,6 +3,19 @@ function random(min, max)
   return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
 end
 
+function gaussRandom(min, max, skew)
+  local u, v = random(0,1), random(0,1)
+
+
+  local num = math.sqrt(-2 * math.log(u)) * math.cos(2 * math.pi * v)
+  if(num > 1 or num < 0) then gaussRandom(min, max, skew) end
+  num = math.pow(num, skew)
+  num = num * (max - min)
+  num = num + min
+
+  return num
+end
+
 function UUID()
   local fn = function(x)
     local r = love.math.random(16) - 1

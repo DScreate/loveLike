@@ -8,6 +8,8 @@ function Projectile:new(zone, x, y, opts)
   self.v = opts.v or 200
   self.color = hp_color
 
+  self.damage = opts.damage or 100
+
   self.TTD = opts.ttd or 12
 
   self.collider = self.zone.world:newCircleCollider(self.x, self.y, self.s)
@@ -16,7 +18,7 @@ function Projectile:new(zone, x, y, opts)
   self.collider:setObject(self)
   self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
-  self.timer:tween(0.5, self, {v = 400}, 'linear')
+  self.timer:tween(0.5, self, {v = 400}, 'out-cubic')
   self.timer:after(self.TTD, function() self:die() end)
 
 end
@@ -25,6 +27,16 @@ function Projectile:update(dt)
   Projectile.super.update(self, dt)
   self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
+  if self.collider:enter('Enemy') then
+    local collision_data = self.collider:getEnterCollisionData('Enemy')
+    local object = collision_data.collider:getObject()
+    if object.hit then
+
+      object:hit(self.damage)
+    end
+
+    self:die()
+  end
 end
 
 function Projectile:draw()

@@ -55,32 +55,35 @@ function Stage:new()
     local color = makeRandomSwatch()
     local x, y = self.player.x + random(-gw/2, gw/2), self.player.y + random(-gh/2, gh/2)
     local w, h = random(20, 100), random(20, 100)
-    self:addDrawableWithinRange(self.scrolling_background, function() useColor(color) love.graphics.rectangle('fill', x, y, w, h) end
-    , gw / 2, gh / 2, { size = 16 })
-  end)
+    self:addDrawableWithinRange(self.scrolling_background,
+    function()
+      useColor(color)
+      love.graphics.rectangle('fill', x, y, w, h) end
+      , gw / 2, gh / 2, { size = 16 })
+    end)
 
-  --input:bind('f8', function() self:moveLayer() end)
+    --input:bind('f8', function() self:moveLayer() end)
 
-  camera:setFollowLerp(0.4)
-  camera:setFollowLead(1)
-  camera:setFollowStyle('TOPDOWN')
-  camera:setBounds(0, 0, gw * self.widthScale, gh * self.heightScale)
+    camera:setFollowLerp(0.4)
+    camera:setFollowLead(1)
+    camera:setFollowStyle('TOPDOWN')
+    camera:setBounds(0, 0, gw * self.widthScale, gh * self.heightScale)
 
-  camera:newLayer(-10, 0, function() self.static_background:draw() end)
-  camera:newLayer(-5, 0.3, function() self.scrolling_background:draw() end)
-  camera:newLayer(1, 1.0, function() self.zone:draw() end)
-  camera:newLayer(10, 1.8, function() self.foreground:draw() end)
+    camera:newLayer(-10, 0, function() self.static_background:draw() end)
+    camera:newLayer(-5, 0.3, function() self.scrolling_background:draw() end)
+    camera:newLayer(1, 1.0, function() self.zone:draw() end)
+    camera:newLayer(10, 1.8, function() self.foreground:draw() end)
 
-end
+  end
 
---[[
-function Stage:moveLayer()
-for i = 1, #camera.layers, 1 do
-local copy = camera.layers[i]
-if (camera.layers[i+1]) then
-local ref = camera.layers[i+1]
-ref.order = copy.order
-ref.scale = copy.scale
+  --[[
+  function Stage:moveLayer()
+  for i = 1, #camera.layers, 1 do
+  local copy = camera.layers[i]
+  if (camera.layers[i+1]) then
+  local ref = camera.layers[i+1]
+  ref.order = copy.order
+  ref.scale = copy.scale
 else
 camera.layers[i+1] = copy
 end
