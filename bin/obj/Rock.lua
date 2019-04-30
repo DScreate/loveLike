@@ -47,11 +47,16 @@ end
 function Rock:die()
   self.dead = true
   self.zone:addGameObject('EnemyDeathEffect', self.x, self.y,
-  {color = hp_color, w = self.w * self.size/4})
-  local v = self.collider:getLinearVelocity()
+  {color = hp_color, w = self.w * self.size/8})
+  local rx, ry = self.collider:getLinearVelocity()
+
   for i = 1, love.math.random(12, 16) do
-    self.zone:addGameObject('ExplodeParticle', self.x, self.y, {color = hp_color, s = random(3,6),
-    r = random(0, v) })
+    local gaussR = math.atan2(
+      gaussRandom(ry - ry/4, ry + ry/4, 1),
+      gaussRandom(rx - rx/4, rx + rx/4, 1)
+    )
+    self.zone:addGameObject('ExplodeParticle', self.x, self.y, {color = hp_color, s = random(3, 8),
+    r = gaussR})
   end
 
   if (self.size > 2 and random(0, self.size) > 2) then

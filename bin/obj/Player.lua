@@ -53,6 +53,7 @@ function Player:new(zone, x, y, opts)
   input:bind('f4', function() self:die() end)
   input:bind('f5', function() slow(2, 2) end)
   input:bind('t', function() self:setAttack('Double') end)
+  input:bind(',', function() self:setAttack('Big') end)
 
   self:autoShoot()
   self.timer:every(5, function() self:tick() end)

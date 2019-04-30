@@ -6,11 +6,13 @@ function Projectile:new(zone, x, y, opts)
   -- s represents the radius of the collider -> note it is not r because that is already in use
   self.s = opts.s or 2.5
   self.v = opts.v or 200
-  self.color = hp_color
+  self.color = opts.color or hp_color
 
   self.damage = opts.damage or 100
 
   self.TTD = opts.ttd or 12
+
+  -- self.die = opts.die or self:die()
 
   self.collider = self.zone.world:newCircleCollider(self.x, self.y, self.s)
   self.collider:setCollisionClass('Projectile')
