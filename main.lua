@@ -1,10 +1,23 @@
 Object = require 'lib/classic/classic'
 Input = require 'lib/boipushy/Input'
+-- Timer = require 'lib/hump/Timer'
 Timer = require 'lib/chrono/Timer'
 M = require 'lib/Moses/moses_min'
 utils = require 'lib/utils'
+Camera = require 'lib/STALKER-X/Camera'
+Draft = require 'lib/draft/draft'
+Vector = require 'lib/hump/vector'
+utf8sub = require 'lib/utf8'
 
 GameObject = require 'bin/GameObject'
+
+Colors = require 'bin/style/Colors'
+
+-- mlib = require 'lib/windfield/mlib/mlib'
+Physics = require 'lib/windfield'
+
+-- array to hold collision messages
+local text = {}
 
 function love.load(arg)
 	-- object recursive require
@@ -17,9 +30,16 @@ function love.load(arg)
 	recursiveEnumerate('bin/rooms', room_files)
 	requireFiles(room_files)
 
+	font_files = {}
+	recursiveEnumerate('resources/fonts', font_files)
+	fonts = {}
+	loadFonts(font_files)
+
 	-- manual associations for requires
 	input = Input()
 	timer = Timer()
+	camera = Camera()
+	draft = Draft()
 
 	-- graphics adjusting
 	resize(2)
@@ -32,26 +52,46 @@ function love.load(arg)
 	current_room = nil
 
 	-- body
+
+	slow_amount = 1
 	-- love.graphics.circle('fill', 50, 50, 50)
+
 
 	gotoRoom('Stage')
 
-	input:bind('f1', function() gotoRoom('CircleRoom') end)
-  input:bind('f2', function() gotoRoom('RectangleRoom') end)
-  input:bind('f3', function() gotoRoom('PolygonRoom') end)
-	input:bind('a', function() gotoRoom('Stage') end)
 
-end
+	input:bind('up', 'boost')
+	input:bind('down', 'brake')
 
+	input:bind('s', function() camera:shake(4, 60, 1) end)
 
-function love.update(dt)
-	-- timer update
-	timer:update(dt)
-	-- room logic
-	if current_room then current_room:update(dt) end
+	input:bind('f1', 'f1')
+	input:bind('f2', function()
+		gotoRoom('Stage')
+	end)
+	input:bind('f3', function()
+		input:bind('f3', function()
+			if current_room then
+				current_room:destroy()
+				current_room = nil
+			end
+		end)
+	end)
+	input:bind('f4', 'f4')
 
+	input:bind('left', 'left')
+	input:bind('right', 'right')
 
-	-- body
+	-- MEMORY CHECKING --
+	input:bind('f1', function()
+		print("Before collection: " .. collectgarbage("count")/1024)
+		collectgarbage()
+		print("After collection: " .. collectgarbage("count")/1024)
+		print("Object count: ")
+		local counts = type_count()
+		for k, v in pairs(counts) do print(k, v) end
+		print("-------------------------------------")
+	end)
 
 end
 
@@ -63,6 +103,15 @@ function love.draw()
 	if current_room then current_room:draw() end
 
 	-- body
+	if flash_frames then
+		flash_frames = flash_frames - 1
+		if flash_frames == -1 then flash_frames = nil end
+	end
+	if flash_frames then
+		useColor(background_color)
+		love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
+		setColor(1, 1, 1)
+	end
 
 end
 
@@ -82,11 +131,13 @@ end
 --[[
 ** LOGIC FOR NOT SAVING ROOMS IN BETWEEN LOADING THEM **
 function gotoRoom(room_type, ...)
-    current_room = _G[room_type](...)
+if current_room and current_room.destroy then current_room:destroy() end
+current_room = _G[room_type](...)
 end
 ]]--
 
 function addRoom(room_type, room_name, ...)
+	if current_room and current_room.destroy then current_room:destroy() end
 	local room = _G[room_type](room_name, ...)
 	rooms[room_name] = room
 	return room
@@ -105,6 +156,15 @@ function gotoRoom(room_type, ...)
 end
 
 -- HELPER FUNCTIONS --
+function slow(amount, duration)
+	slow_amount = amount
+	timer:tween(duration, _G, {slow_amount = 1}, 'in-out-cubic', 'slow')
+end
+
+function flash(frames)
+	flash_frames = frames
+end
+
 function requireFiles(files)
 	for _, file_iter in ipairs(files) do
 		local file = file_iter:sub(1, -5)
@@ -112,6 +172,18 @@ function requireFiles(files)
 		local class_name = file:sub(last_forward_slash_index+1, #file)
 		package.loaded[file] = nil
 		_G[class_name] = require(file)
+	end
+end
+
+function loadFonts(files)
+	for i = 8, 16, 1 do
+			for _, font_path in pairs(files) do
+					local last_forward_slash_index = font_path:find("/[^/]*$")
+					local font_name = font_path:sub(last_forward_slash_index+1, -5)
+					local font = love.graphics.newFont(font_path, i)
+					font:setFilter('nearest', 'nearest')
+					fonts[font_name .. '_' .. i] = font
+			end
 	end
 end
 
@@ -128,11 +200,16 @@ function recursiveEnumerate(folder, file_list)
 end
 
 function resize(s)
-    love.window.setMode(s*gw, s*gh)
-    sx, sy = s, s
+	love.window.setMode(s*gw, s*gh)
+	sx, sy = s, s
 end
 
 -- LOVE FUNCTIONS --
+function love.update(dt)
+	timer:update(dt*slow_amount)
+	camera:update(dt*slow_amount)
+	if current_room then current_room:update(dt*slow_amount) end
+end
 
 function love.run()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
